@@ -1,3 +1,3 @@
 # This is backend project
 
-Backend developement done using javascript
+Backend development done using javascript

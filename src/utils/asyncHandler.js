@@ -12,9 +12,9 @@ const asyncHandler = (func) => async (req, res, next) => {
 };
 */
 
-// APPROACH with higher order functions
+// APPROACH with higher order functions- which accepts a function and returns a function
 const asyncHandler = (requestHandler) => {
-  (req, res, next) => {
+  return (req, res, next) => {
     Promise.resolve(requestHandler(req, res, next)).catch((error) =>
       next(error)
     );
