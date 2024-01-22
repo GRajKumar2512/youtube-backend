@@ -220,6 +220,79 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "current user fetched successfully."));
 });
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+
+  if (!username?.trim()) {
+    throw new ApiError(400, "username is missing");
+  }
+
+  // TASK: here the username is the channel on whose profile page you have navigated to presently
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username?.toLowerCase(),
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscribers",
+        as: "subscribedTo",
+      },
+    },
+    {
+      $addFields: {
+        subscribersCount: {
+          $size: "$subscribers", // returns the size of the array
+        },
+        channelsSubscribedTo: {
+          $size: "$subscribedTo", // returns the size of the array
+        },
+        isSubscribed: {
+          // if currently logged user's id is present in the list of subscribers of this channel
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] }, // here the $in operator looks in array or object both
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        fullname: 1,
+        username: 1,
+        subscribersCount: 1,
+        channelsSubscribedTo: 1,
+        isSubscribed: 1,
+        avatar: 1,
+        coverImage: 1,
+      },
+    },
+  ]);
+
+  // return value of the aggregate pipeline is array
+  if (!channel?.length) {
+    throw new ApiError(400, "channel does not exist");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, channel[0], "channel data fetched successfully.")
+    );
+});
+
 export {
   registerUser,
   loginUser,
@@ -227,4 +300,5 @@ export {
   refreshAccessToken,
   changeCurrentPassword,
   getCurrentUser,
+  getUserChannelProfile,
 };
