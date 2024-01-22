@@ -2,11 +2,11 @@ import multer from "multer";
 
 // TASK: created the middleware for the storage of the file
 const storage = multer.diskStorage({
-  // destination is the path the file should be stored
+  // set the destination by using the callback
   destination: function (req, file, cb) {
     cb(null, "./public/temp");
   },
-  // filename is the name of the file when uploaded to that destination
+  // set the filename by using the callback
   filename: function (req, file, cb) {
     cb(null, file.originalname);
   },

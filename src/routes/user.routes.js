@@ -13,7 +13,7 @@ const router = Router();
 router.post(
   "/register",
   upload.fields([
-    { name: "avatar", maxCount: 1 },
+    { name: "avatar", maxCount: 1 }, // both name avatar and coverImage is received from the frontend, thus should be same names
     { name: "coverImage", maxCount: 1 },
   ]),
   registerUser
