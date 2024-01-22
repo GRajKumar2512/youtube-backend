@@ -19,7 +19,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     // TASK: find the user with this id in the database to verify
     const user = await User.findById(decodedToken._id).select(
-      "-password refreshToken"
+      "-password -refreshToken"
     );
 
     // TASK: check is the user exists
