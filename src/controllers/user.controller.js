@@ -139,7 +139,11 @@ const logoutUser = asyncHandler(async (req, res) => {
   // TASK: remove the refresh token from the database
   await User.findByIdAndUpdate(
     req.user._id,
-    { $set: { refreshToken: undefined } },
+    {
+      $unset: {
+        refreshToken: 1, // this removes the this field from the document
+      },
+    },
     { new: true }
   );
 
@@ -357,4 +361,5 @@ export {
   changeCurrentPassword,
   getCurrentUser,
   getUserChannelProfile,
+  getWatchHistory,
 };
